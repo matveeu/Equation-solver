@@ -22,6 +22,7 @@ void bisection(){
     cin >> func;
 
     clear_screen();
+
     cout << "ВВОД КОЭФФИЦИЕНТОВ\n";
 
     double params[4] = {0};
@@ -33,6 +34,7 @@ void bisection(){
             cout << "b = "; cin >> params[1];
             break;
     }
+
     clear_screen();
 
     cout << "ПАРАМЕТРЫ МЕТОДА";
@@ -88,18 +90,86 @@ void bisection(){
     cout << "\nКоличество итераций: " << iters;
 }
 
-void newton(){
-    
+void chord(){
+    int func;
+    clear_screen();
+
+    cout << "МЕТОД БИСЕКЦИИ";
+
+    cout << "\n\nВыберите функцию:\n";
+    cout << "1.Линейная - kx + b = 0\n";
+    cin >> func;
+
+    clear_screen();
+
+    cout << "ВВОД КОЭФФИЦИЕНТОВ\n";
+
+    double params[4] = {0};
+
+    switch (func){
+        case 1:
+            cout << "Функция: kx + b = 0\n";
+            cout << "k = "; cin >> params[0];
+            cout << "b = "; cin >> params[1];
+            break;
+    }
+
+    clear_screen();
+
+    cout << "ПАРАМЕТРЫ МЕТОДА";
+    double x0, x1, eps;
+    cout << "\nВведите две начальные точки:\n";
+    cout << "x0 = "; cin >> x0;
+    cout << "x1 = "; cin >> x1;
+    cout << "Точность: "; cin >> eps;
+
+    double xp = x0, xc = x1; //xp - x_previous; xc - x_current
+    int iters = 0;
+
+    while (iters<=50){
+        iters++;
+        double fp, fc; //fp - f_previous; fc - f_current
+
+        switch (func){
+            case 1:
+                fp = linear(xp, params[0], params[1]);
+                fc = linear(xc, params[0], params[1]);
+                break;
+        }
+
+        double xn = xc - fc * (xc - xp) / (fc - fp); //xn - x_next
+
+        double fn; //fn - f_next
+
+        switch (func){
+            case 1:
+                fn = linear(xn, params[0], params[1]);
+        }
+
+        if (fabs(fn) < eps){
+            xc = xn;
+            break;
+        }
+
+        xp = xc;
+        xc = xn;
+    }
+
+    clear_screen();
+
+    cout << "РЕЗУЛЬТАТ\n";
+    cout << "Корень: x = " << xc;
+    cout << "\nКоличество итераций: " << iters;
 }
 
-void chord(){
+void newton(){
 
 }
 
 void menu(){
     clear_screen();
     
-    cout << "        SOLVER 1.0\n\n";
+    cout << "        SOLVER 1.0.1\n\n";
 
     cout << "1.Метод бисекции\n";
     cout << "2.Метод хорд\n";
@@ -125,9 +195,9 @@ int main(){
         if(choice == 1){
             bisection();
         } else if(choice == 2){
-            newton();
-        } else if(choice == 3){
             chord();
+        } else if(choice == 3){
+            newton();
         } else {
             cout << "\n\n\nВыберите один из трёх существующих методов!";
             cin.ignore();
