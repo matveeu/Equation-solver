@@ -7,15 +7,20 @@ void clear_screen(){
     system("clear");
 }
 
+//ФУНКЦИИ
+
 double linear(double x, double k, double b) {
     return k*x+b;
 }
+
+
+//МЕТОДЫ
 
 void bisection(){
     int func;
     clear_screen();
 
-    cout << "МЕТОД БИСЕКЦИИ";
+    cout << "МЕТОД БИСЕКЦИИ (ПОЛОВИННОГО ДЕЛЕНИЯ)";
 
     cout << "\n\nВыберите функцию:\n";
     cout << "1.Линейная - kx + b = 0\n";
@@ -94,7 +99,7 @@ void chord(){
     int func;
     clear_screen();
 
-    cout << "МЕТОД БИСЕКЦИИ";
+    cout << "МЕТОД ХОРД (СЕКУЩИХ)";
 
     cout << "\n\nВыберите функцию:\n";
     cout << "1.Линейная - kx + b = 0\n";
@@ -165,6 +170,8 @@ void chord(){
 void newton(){
 
 }
+
+//МЕНЮ
 
 void menu(){
     clear_screen();
