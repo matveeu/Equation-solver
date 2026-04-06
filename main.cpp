@@ -4,20 +4,23 @@ using namespace std;
 #define ll long long
 
 void clear_screen(){
-    system("clear");
+    system("clear"); //очистка терминала для Unix систем
 }
 
 //ФУНКЦИИ
 
+//линейная y=kx+b
 double linear(double x, double k, double b) {
     return k*x+b;
 }
 
+//квадратичная y=x²
+//double quadratic
 
 //МЕТОДЫ
 
 void bisection(){
-    int func;
+    int func; // номер функции
     clear_screen();
 
     cout << "МЕТОД БИСЕКЦИИ (ПОЛОВИННОГО ДЕЛЕНИЯ)";
@@ -30,26 +33,26 @@ void bisection(){
 
     cout << "ВВОД КОЭФФИЦИЕНТОВ\n";
 
-    double params[4] = {0};
+    double params[4] = {0}; // массив для хранения коэффициентов функции
 
     switch (func){
         case 1:
             cout << "Функция: kx + b = 0\n";
-            cout << "k = "; cin >> params[0];
-            cout << "b = "; cin >> params[1];
+            cout << "k = "; cin >> params[0]; // коэф k
+            cout << "b = "; cin >> params[1]; // коэф b
             break;
     }
 
     clear_screen();
 
     cout << "ПАРАМЕТРЫ МЕТОДА";
-    double a, b, eps;
+    double a, b, eps; // a,b - границы [a;b], eps - точность
     cout << "\nДля метода бисекции нужен интервал [a; b]:\n";
     cout << "a = "; cin >> a;
     cout << "b = "; cin >> b;
     cout << "Точность (например 0.0001): "; cin >> eps;
 
-    double fa, fb;
+    double fa, fb; // значения функции на концах отрезка [a;b]
 
     switch (func){
         case 1:
@@ -57,6 +60,8 @@ void bisection(){
             fb = linear(b, params[0], params[1]);
             break;
     }
+
+    // если значения функций на концах отрезка [a;b] равны, то корня на этом отрезке нет
     if (fa*fb>0){
         cout << "error: same signs on f(a) and f(b): " << fa << " " << fb << endl;
         return;
@@ -64,14 +69,15 @@ void bisection(){
 
     clear_screen();
 
-    double c;
-    int iters = 0;
+    double c; // середина отрезка
+    int iters = 0; // кол-во итераций
 
-    while (fabs(b-a) >= eps && iters < 50){
+    // пока длина отрезка больше точности И не превышен лимит итераций
+    while (fabs(b-a) >= eps && iters < 50){ 
         iters++;
-        c = (a+b)/2;
+        c = (a+b)/2; // середина отрезка
 
-        double fc;
+        double fc; // значение функции в середине отрезка
 
         switch (func){
             case 1:
@@ -79,12 +85,13 @@ void bisection(){
                 break;
         }
 
-        if (fc == 0) break;
+        if (fc == 0) break; // точно нашли корень
 
-        if (fc * fa < 0){
+        // выбор новой половины отрезка (где есть корень)
+        if (fc * fa < 0){ // если корень между а и с
             b = c;
             fb = fc;
-        } else {
+        } else { // если корень между с и b
             a = c;
             fa = fc;
         }
@@ -96,7 +103,7 @@ void bisection(){
 }
 
 void chord(){
-    int func;
+    int func; //номер функции
     clear_screen();
 
     cout << "МЕТОД ХОРД (СЕКУЩИХ)";
@@ -109,7 +116,7 @@ void chord(){
 
     cout << "ВВОД КОЭФФИЦИЕНТОВ\n";
 
-    double params[4] = {0};
+    double params[4] = {0}; // коэффициенты функции
 
     switch (func){
         case 1:
@@ -122,18 +129,18 @@ void chord(){
     clear_screen();
 
     cout << "ПАРАМЕТРЫ МЕТОДА";
-    double x0, x1, eps;
+    double x0, x1, eps; // начальные точки и точность
     cout << "\nВведите две начальные точки:\n";
     cout << "x0 = "; cin >> x0;
     cout << "x1 = "; cin >> x1;
     cout << "Точность: "; cin >> eps;
 
-    double xp = x0, xc = x1; //xp - x_previous; xc - x_current
-    int iters = 0;
+    double xp = x0, xc = x1; // xp - x_previous; xc - x_current
+    int iters = 0; // кол-во итераций
 
     while (iters<=50){
         iters++;
-        double fp, fc; //fp - f_previous; fc - f_current
+        double fp, fc; // fp - f_previous; fc - f_current
 
         switch (func){
             case 1:
@@ -142,17 +149,17 @@ void chord(){
                 break;
         }
 
-        double xn = xc - fc * (xc - xp) / (fc - fp); //xn - x_next
+        double xn = xc - fc * (xc - xp) / (fc - fp); // xn - x_next (следующее приближение)
 
-        double fn; //fn - f_next
+        double fn; // fn - f_next (f(xn))
 
         switch (func){
             case 1:
                 fn = linear(xn, params[0], params[1]);
         }
 
-        if (fabs(fn) < eps){
-            xc = xn;
+        if (fabs(fn) < eps){ // если достигли точности
+            xc = xn; // обновляем корень
             break;
         }
 
@@ -168,7 +175,76 @@ void chord(){
 }
 
 void newton(){
+    int func;  // номер выбранной функции
+    clear_screen();
 
+    cout << "МЕТОД НЬЮТОНА (КАСАТЕЛЬНЫХ)";
+
+    cout << "\n\nВыберите функцию:\n";
+    cout << "1. Линейная - kx + b = 0\n";
+    cin >> func;
+
+    clear_screen();
+
+    cout << "ВВОД КОЭФФИЦИЕНТОВ\n";
+
+    double params[4] = {0};  // коэффициенты функции
+
+    switch (func){
+        case 1:
+            cout << "Функция: kx + b = 0\n";
+            cout << "k = "; cin >> params[0];  // коэффициент k
+            cout << "b = "; cin >> params[1];  // коэффициент b
+            break;
+    }
+
+    clear_screen();
+
+    cout << "ПАРАМЕТРЫ МЕТОДА";
+    double x0, eps;  // x0 - начальное приближение, eps - точность
+    cout << "\nВведите начальное приближение:\n";
+    cout << "x0 = "; cin >> x0;
+    cout << "Точность (например 0.0001): "; cin >> eps;
+
+    double x = x0;  // текущее приближение корня (начинаем с x0)
+    int iters = 0;  // счётчик итераций
+
+    // лимит 50 итераций, чтобы не зависнуть
+    while (iters < 50){
+        iters++;
+        
+        double fx, dfx;  // fx = f(x), dfx = f'(x) (производная)
+        
+        switch (func){
+            case 1:
+                // для линейной функции: f(x) = k*x + b
+                fx = linear(x, params[0], params[1]);  // значение функции
+                dfx = params[0];  // производная от kx+b равна просто k
+                break;
+        }
+        
+        // защита от деления на ноль (если производная = 0)
+        if (fabs(dfx) < 1e-12){
+            cout << "Ошибка: производная близка к нулю\n";
+            return;
+        }
+        
+        double xn = x - fx / dfx;
+        
+        // проверка на достижение точности
+        if (fabs(xn - x) < eps){
+            x = xn;  // обновляем корень
+            break;
+        }
+        
+        x = xn;  // переходим к следующей итерации
+    }
+
+    clear_screen();
+
+    cout << "РЕЗУЛЬТАТ\n";
+    cout << "Корень: x = " << x;
+    cout << "\nКоличество итераций: " << iters;
 }
 
 //МЕНЮ
@@ -176,7 +252,7 @@ void newton(){
 void menu(){
     clear_screen();
     
-    cout << "        SOLVER 1.0.1\n\n";
+    cout << "        SOLVER 1.0.3\n\n";
 
     cout << "1.Метод бисекции\n";
     cout << "2.Метод хорд\n";
