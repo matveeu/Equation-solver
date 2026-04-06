@@ -14,8 +14,14 @@ double linear(double x, double k, double b) {
     return k*x+b;
 }
 
-//квадратичная y=x²
-//double quadratic
+//квадратичная y=ax²+bx+c и её производная y'=2ax+b
+double quadratic(double x, double a, double b, double c) {
+    return a*x*x+b*x+c;
+}
+double quadratic_derivative(double x, double a, double b, double c) {
+    return 2*a*x+b;
+}
+
 
 //МЕТОДЫ
 
@@ -27,6 +33,7 @@ void bisection(){
 
     cout << "\n\nВыберите функцию:\n";
     cout << "1.Линейная - kx + b = 0\n";
+    cout << "2.Квадратичная - ax² + bx + c = 0\n";
     cin >> func;
 
     clear_screen();
@@ -40,6 +47,12 @@ void bisection(){
             cout << "Функция: kx + b = 0\n";
             cout << "k = "; cin >> params[0]; // коэф k
             cout << "b = "; cin >> params[1]; // коэф b
+            break;
+        case 2:
+            cout << "Функция: ax² + bx + c = 0\n";
+            cout << "a = "; cin >> params[0]; //коэф а
+            cout << "b = "; cin >> params[1]; //коэф b
+            cout << "c = "; cin >> params[2]; //коэф c
             break;
     }
 
@@ -59,11 +72,16 @@ void bisection(){
             fa = linear(a, params[0], params[1]);
             fb = linear(b, params[0], params[1]);
             break;
+        case 2:
+            fa = quadratic(a, params[0], params[1], params[2]);
+            fb = quadratic(b, params[0], params[1], params[2]);
+            break;
     }
 
     // если значения функций на концах отрезка [a;b] равны, то корня на этом отрезке нет
     if (fa*fb>0){
         cout << "error: same signs on f(a) and f(b): " << fa << " " << fb << endl;
+        cout << "На отрезке нет корня или их чётное количество" << endl;
         return;
     }
 
@@ -82,6 +100,9 @@ void bisection(){
         switch (func){
             case 1:
                 fc = linear(c, params[0], params[1]);
+                break;
+            case 2:
+                fc = quadratic(c, params[0], params[1], params[2]);
                 break;
         }
 
@@ -110,6 +131,7 @@ void chord(){
 
     cout << "\n\nВыберите функцию:\n";
     cout << "1.Линейная - kx + b = 0\n";
+    cout << "2.Квадратичная - ax² + bx + c = 0\n";
     cin >> func;
 
     clear_screen();
@@ -124,6 +146,12 @@ void chord(){
             cout << "k = "; cin >> params[0];
             cout << "b = "; cin >> params[1];
             break;
+        case 2:
+            cout << "Функция: ax² + bx + c = 0\n";
+            cout << "a = "; cin >> params[0]; //коэф а
+            cout << "b = "; cin >> params[1]; //коэф b
+            cout << "c = "; cin >> params[2]; //коэф c
+            break;
     }
 
     clear_screen();
@@ -133,7 +161,7 @@ void chord(){
     cout << "\nВведите две начальные точки:\n";
     cout << "x0 = "; cin >> x0;
     cout << "x1 = "; cin >> x1;
-    cout << "Точность: "; cin >> eps;
+    cout << "Точность (например 0.0001): "; cin >> eps;
 
     double xp = x0, xc = x1; // xp - x_previous; xc - x_current
     int iters = 0; // кол-во итераций
@@ -147,6 +175,10 @@ void chord(){
                 fp = linear(xp, params[0], params[1]);
                 fc = linear(xc, params[0], params[1]);
                 break;
+            case 2:
+                fp = quadratic(xp, params[0], params[1], params[2]);
+                fc = quadratic(xc, params[0], params[1], params[2]);
+                break;
         }
 
         double xn = xc - fc * (xc - xp) / (fc - fp); // xn - x_next (следующее приближение)
@@ -156,6 +188,10 @@ void chord(){
         switch (func){
             case 1:
                 fn = linear(xn, params[0], params[1]);
+                break;
+            case 2:
+                fn = quadratic(xn, params[0], params[1], params[2]);
+                break;
         }
 
         if (fabs(fn) < eps){ // если достигли точности
@@ -182,6 +218,7 @@ void newton(){
 
     cout << "\n\nВыберите функцию:\n";
     cout << "1. Линейная - kx + b = 0\n";
+    cout << "2.Квадратичная - ax² + bx + c = 0\n";
     cin >> func;
 
     clear_screen();
@@ -195,6 +232,12 @@ void newton(){
             cout << "Функция: kx + b = 0\n";
             cout << "k = "; cin >> params[0];  // коэффициент k
             cout << "b = "; cin >> params[1];  // коэффициент b
+            break;
+        case 2:
+            cout << "Функция: ax² + bx + c = 0\n";
+            cout << "a = "; cin >> params[0]; //коэф а
+            cout << "b = "; cin >> params[1]; //коэф b
+            cout << "c = "; cin >> params[2]; //коэф c
             break;
     }
 
@@ -217,12 +260,17 @@ void newton(){
         
         switch (func){
             case 1:
-                // для линейной функции: f(x) = k*x + b
-                fx = linear(x, params[0], params[1]);  // значение функции
+                // для линейной функции: f(x) = kx + b
+                fx = linear(x, params[0], params[1]);
                 dfx = params[0];  // производная от kx+b равна просто k
                 break;
+            case 2:
+                // для квадратичной функции: f(x) = ax² + bx + c
+                fx = quadratic(x, params[0], params[1], params[2]);
+                dfx = quadratic_derivative(x, params[0], params[1], params[2]);
+                break;
         }
-        
+
         // защита от деления на ноль (если производная = 0)
         if (fabs(dfx) < 1e-12){
             cout << "Ошибка: производная близка к нулю\n";
@@ -252,7 +300,7 @@ void newton(){
 void menu(){
     clear_screen();
     
-    cout << "        SOLVER 1.0.3\n\n";
+    cout << "        SOLVER 1.0.4\n\n";
 
     cout << "1.Метод бисекции\n";
     cout << "2.Метод хорд\n";
