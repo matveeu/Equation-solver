@@ -1,341 +1,195 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define ll long long
-
 void clear_screen(){
     system("clear"); //очистка терминала для Unix систем
 }
 
 //ФУНКЦИИ
 
-//линейная y=kx+b
+//1.линейная y=kx+b
 double linear(double x, double k, double b) {
     return k*x+b;
 }
 
-//квадратичная y=ax²+bx+c и её производная y'=2ax+b
+//2.квадратичная y=ax²+bx+c
 double quadratic(double x, double a, double b, double c) {
     return a*x*x+b*x+c;
 }
-double quadratic_derivative(double x, double a, double b, double c) {
-    return 2*a*x+b;
-}
 
-//обратная пропорциональность y=k/x+b и её производная y'=-k/x²
+//3.обратная пропорциональность y=k/x+b
 double hyperbola(double x, double k, double b) {
     return k/x-b;
 }
-double hyperbola_derivative(double x, double k, double b) {
-    return -k/(x*x);
+
+//4.синус y=sin(x)-b
+double sinf(double x, double b) {
+    return sin(x)-b;
 }
 
-//синус
+//5.экспонента
+double expf(double x, double b) {
+    return exp(x)-b;
+}
 
-//МЕТОДЫ
+//6.логарифм
+double logf(double x, double b) {
+    return log(x)-b;
+}
 
-void bisection(){
-    int func; // номер функции
-    clear_screen();
-
-    cout << "МЕТОД БИСЕКЦИИ (ПОЛОВИННОГО ДЕЛЕНИЯ)";
-
+//ВЫБОР ФУНКЦИИ
+void func() {
     cout << "\n\nВыберите функцию:\n";
     cout << "1.Линейная - kx + b = 0\n";
     cout << "2.Квадратичная - ax² + bx + c = 0\n";
     cout << "3.Гипербола - k/x = b (x != 0)\n";
-    //cout << "4.Синус - sin(x) = d (d ∈ [-1; 1])\n";
-    cin >> func;
+    cout << "4.Синус - sin x = b (b ∈ [-1; 1])\n";
+    cout << "5.Экспонента - eˣ = b (b > 0)\n";
+    cout << "6.Натуральный логарифм - ln x = b (x > 0)\n";
+}
+void input_params(int type, double p[]) {
+    if (type == 1) { cout << "\nk: "; cin >> p[0]; cout << "\nb: "; cin >> p[1]; }
+    else if (type == 2) { cout << "\na: "; cin >> p[0]; cout << "\nb: "; cin >> p[1]; cout << "\nc: "; cin >> p[2]; }
+    else if (type == 3) { cout << "\nk: "; cin >> p[0]; cout << "\nb: "; cin >> p[1]; if (p[0] == 0) { cout << "Ошибка: k не может быть 0\n"; return; } }
+    else { cout << "\nb: "; cin >> p[0]; }
+}
+
+double eval(int type, double x, double p[]) {
+    switch(type) {
+        case 1: return linear(x, p[0], p[1]);
+        case 2: return quadratic(x, p[0], p[1], p[2]);
+        case 3: return hyperbola(x, p[0], p[1]);
+        case 4: return sinf(x, p[0]);
+        case 5: return expf(x, p[0]);
+        case 6: return logf(x, p[0]);
+        default: return 0;
+    }
+}
+
+//МЕТОДЫ
+
+void bisection(){
+    int type; double p[3]={0}, a, b, c = 0, eps, fa, fb, fc; int iters = 0;
+    clear_screen();
+
+    cout << "МЕТОД БИСЕКЦИИ (ПОЛОВИННОГО ДЕЛЕНИЯ)";
+    func();
+    cin >> type;
 
     clear_screen();
 
     cout << "ВВОД КОЭФФИЦИЕНТОВ\n";
-
-    double params[4] = {0}; // массив для хранения коэффициентов функции
-
-    switch (func){
-        case 1:
-            cout << "Функция: kx + b = 0\n";
-            cout << "k = "; cin >> params[0]; // коэф k
-            cout << "b = "; cin >> params[1]; // коэф b
-            break;
-        case 2:
-            cout << "Функция: ax² + bx + c = 0\n";
-            cout << "a = "; cin >> params[0]; //коэф а
-            cout << "b = "; cin >> params[1]; //коэф b
-            cout << "c = "; cin >> params[2]; //коэф c
-            break;
-        case 3:
-            cout << "Функция: k/x = b\n";
-            cout << "k = "; cin >> params[0]; // коэф k
-            cout << "b = "; cin >> params[1]; // коэф b
-            break;
-    }
+    input_params(type, p);
 
     clear_screen();
 
     cout << "ПАРАМЕТРЫ МЕТОДА";
-    double a, b, eps; // a,b - границы [a;b], eps - точность
     cout << "\nДля метода бисекции нужен интервал [a; b]:\n";
-    cout << "a = "; cin >> a;
-    cout << "b = "; cin >> b;
+    cout << "a: "; cin >> a;
+    cout << "b: "; cin >> b;
     cout << "Точность (например 0.0001): "; cin >> eps;
-
-    double fa, fb; // значения функции на концах отрезка [a;b]
-
-    switch (func){
-        case 1:
-            fa = linear(a, params[0], params[1]);
-            fb = linear(b, params[0], params[1]);
-            break;
-        case 2:
-            fa = quadratic(a, params[0], params[1], params[2]);
-            fb = quadratic(b, params[0], params[1], params[2]);
-            break;
-        case 3:
-            if (a == 0 || b == 0) {
-                cout << "Ошибка: гипербола не определена в x=0!\n";
-                return;
-            }
-            fa = hyperbola(a, params[0], params[1]);
-            fb = hyperbola(b, params[0], params[1]);
-            break;
-    }
+    clear_screen();
+    fa = eval(type, a, p); fb = eval(type, b, p);
 
     // если значения функций на концах отрезка [a;b] равны, то корня на этом отрезке нет
     if (fa*fb>0){
-        cout << "error: same signs on f(a) and f(b): " << fa << " " << fb << endl;
-        cout << "На отрезке нет корня или их чётное количество" << endl;
+        cout << "error: same signs on f(a) and f(b): " << fa << " " << fb << "\nНа отрезке нет корня или их чётное количество\n";
         return;
     }
 
     clear_screen();
 
-    double c; // середина отрезка
-    int iters = 0; // кол-во итераций
-
     // пока длина отрезка больше точности И не превышен лимит итераций
     while (fabs(b-a) >= eps && iters < 50){ 
-        iters++;
-        c = (a+b)/2; // середина отрезка
-
-        double fc; // значение функции в середине отрезка
-
-        switch (func){
-            case 1:
-                fc = linear(c, params[0], params[1]);
-                break;
-            case 2:
-                fc = quadratic(c, params[0], params[1], params[2]);
-                break;
-            case 3:
-                if (a == 0 || b == 0) {
-                    cout << "Ошибка: гипербола не определена в x=0!\n";
-                    return;
-                }   
-                fc = hyperbola(c, params[0], params[1]);
-                break;
-        }
-
+        iters++; c = (a+b)/2; fc = eval(type, c, p);
         if (fc == 0) break; // точно нашли корень
-
-        // выбор новой половины отрезка (где есть корень)
+        // выбор новой половины отрезка (где есть корень):
         if (fc * fa < 0){ // если корень между а и с
-            b = c;
-            fb = fc;
+            b = c; fb = fc;
         } else { // если корень между с и b
-            a = c;
-            fa = fc;
+            a = c; fa = fc;
         }
     }
 
+    cout << fixed << setprecision(10);
     cout << "РЕЗУЛЬТАТ\n";
     cout << "Корень: x = " << c;
     cout << "\nКоличество итераций: " << iters;
 }
 
 void chord(){
-    int func; //номер функции
+    int type; double p[3]={0}, x0, x1, eps, xp, xc; int iters = 0;
     clear_screen();
 
     cout << "МЕТОД ХОРД (СЕКУЩИХ)";
-
-    cout << "\n\nВыберите функцию:\n";
-    cout << "1.Линейная - kx + b = 0\n";
-    cout << "2.Квадратичная - ax² + bx + c = 0\n";
-    cout << "3.Гипербола - k/x = b (x != 0)\n";
-    cin >> func;
+    func();
+    cin >> type;
 
     clear_screen();
 
     cout << "ВВОД КОЭФФИЦИЕНТОВ\n";
-
-    double params[4] = {0}; // коэффициенты функции
-
-    switch (func){
-        case 1:
-            cout << "Функция: kx + b = 0\n";
-            cout << "k = "; cin >> params[0];
-            cout << "b = "; cin >> params[1];
-            break;
-        case 2:
-            cout << "Функция: ax² + bx + c = 0\n";
-            cout << "a = "; cin >> params[0]; //коэф а
-            cout << "b = "; cin >> params[1]; //коэф b
-            cout << "c = "; cin >> params[2]; //коэф c
-            break;
-        case 3:
-            cout << "Функция: k/x = b\n";
-            cout << "k = "; cin >> params[0]; // коэф k
-            cout << "b = "; cin >> params[1]; // коэф b
-            break;
-    }
+    input_params(type, p);
 
     clear_screen();
 
     cout << "ПАРАМЕТРЫ МЕТОДА";
-    double x0, x1, eps; // начальные точки и точность
     cout << "\nВведите две начальные точки:\n";
-    cout << "x0 = "; cin >> x0;
-    cout << "x1 = "; cin >> x1;
+    cout << "x0: "; cin >> x0;
+    cout << "x1: "; cin >> x1;
     cout << "Точность (например 0.0001): "; cin >> eps;
-
-    double xp = x0, xc = x1; // xp - x_previous; xc - x_current
-    int iters = 0; // кол-во итераций
+    clear_screen();
+    xp = x0, xc = x1; // xp - x_previous; xc - x_current
 
     while (iters<=50){
         iters++;
-        double fp, fc; // fp - f_previous; fc - f_current
-
-        switch (func){
-            case 1:
-                fp = linear(xp, params[0], params[1]);
-                fc = linear(xc, params[0], params[1]);
-                break;
-            case 2:
-                fp = quadratic(xp, params[0], params[1], params[2]);
-                fc = quadratic(xc, params[0], params[1], params[2]);
-                break;
-            case 3:
-                if (xp == 0 || xc == 0) {
-                    cout << "Ошибка: гипербола не определена в x=0!\n";
-                    return;
-                }
-                fp = hyperbola(xp, params[0], params[1]);
-                fc = hyperbola(xc, params[0], params[1]);
-                break;
-        }
-
+        double fp = eval(type, xp, p), fc = eval(type, xc, p);
         double xn = xc - fc * (xc - xp) / (fc - fp); // xn - x_next (следующее приближение)
 
-        double fn; // fn - f_next (f(xn))
-
-        switch (func){
-            case 1:
-                fn = linear(xn, params[0], params[1]);
-                break;
-            case 2:
-                fn = quadratic(xn, params[0], params[1], params[2]);
-                break;
-            case 3:
-                if (xn == 0) {
-                    cout << "Ошибка: гипербола не определена в x=0!\n";
-                    return;
-                }
-                fn = hyperbola(xn, params[0], params[1]);
-                break;
+        if (fabs(xn-xc) < eps) { // если достигли точности
+            cout << fixed << setprecision(10);
+            cout << "РЕЗУЛЬТАТ\n";
+            cout << "Корень: x = " << xc;
+            cout << "\nКоличество итераций: " << iters;
+            return;
         }
-
-        if (fabs(fn) < eps){ // если достигли точности
-            xc = xn; // обновляем корень
-            break;
-        }
-
-        xp = xc;
-        xc = xn;
+        xp = xc; xc = xn;
     }
-
-    clear_screen();
-
-    cout << "РЕЗУЛЬТАТ\n";
-    cout << "Корень: x = " << xc;
-    cout << "\nКоличество итераций: " << iters;
 }
 
 void newton(){
-    int func;  // номер выбранной функции
+    int type; double p[3]={0}, x0, eps, x; int iters = 0;
     clear_screen();
 
     cout << "МЕТОД НЬЮТОНА (КАСАТЕЛЬНЫХ)";
-
-    cout << "\n\nВыберите функцию:\n";
-    cout << "1. Линейная - kx + b = 0\n";
-    cout << "2.Квадратичная - ax² + bx + c = 0\n";
-    cout << "3.Гипербола - k/x = b (x != 0)\n";
-    cin >> func;
+    func();
+    cin >> type;
 
     clear_screen();
 
     cout << "ВВОД КОЭФФИЦИЕНТОВ\n";
-
-    double params[4] = {0};  // коэффициенты функции
-
-    switch (func){
-        case 1:
-            cout << "Функция: kx + b = 0\n";
-            cout << "k = "; cin >> params[0];  // коэффициент k
-            cout << "b = "; cin >> params[1];  // коэффициент b
-            break;
-        case 2:
-            cout << "Функция: ax² + bx + c = 0\n";
-            cout << "a = "; cin >> params[0]; //коэф а
-            cout << "b = "; cin >> params[1]; //коэф b
-            cout << "c = "; cin >> params[2]; //коэф c
-            break;
-        case 3:
-            cout << "Функция: k/x = b\n";
-            cout << "k = "; cin >> params[0]; // коэф k
-            cout << "b = "; cin >> params[1]; // коэф b
-            break;
-    }
+    input_params(type, p);
 
     clear_screen();
 
     cout << "ПАРАМЕТРЫ МЕТОДА";
-    double x0, eps;  // x0 - начальное приближение, eps - точность
     cout << "\nВведите начальное приближение:\n";
-    cout << "x0 = "; cin >> x0;
+    cout << "x0: "; cin >> x0;
     cout << "Точность (например 0.0001): "; cin >> eps;
+    clear_screen();
 
-    double x = x0;  // текущее приближение корня (начинаем с x0)
-    int iters = 0;  // счётчик итераций
+    x = x0;
 
-    // лимит 50 итераций, чтобы не зависнуть
     while (iters < 50){
         iters++;
+        double fx = eval(type, x, p), dfx;  // fx = f(x), dfx = f'(x) (производная)
         
-        double fx, dfx;  // fx = f(x), dfx = f'(x) (производная)
-        
-        switch (func){
-            case 1:
-                // для линейной функции: f(x) = kx + b
-                fx = linear(x, params[0], params[1]);
-                dfx = params[0];  // производная от kx+b равна просто k
-                break;
-            case 2:
-                // для квадратичной функции: f(x) = ax² + bx + c
-                fx = quadratic(x, params[0], params[1], params[2]);
-                dfx = quadratic_derivative(x, params[0], params[1], params[2]);
-                break;
-            case 3:
-                if (x == 0) {
-                    cout << "Ошибка: гипербола не определена в x=0!\n";
-                    return;
-                }
-                // для гиперболы: f(x) = k/x - b
-                fx = hyperbola(x, params[0], params[1]);
-                dfx = hyperbola_derivative(x, params[0], params[1]);
-                break;
+        switch (type){
+            case 1: dfx = p[0]; break;
+            case 2: dfx = 2*p[0]*x+p[1]; break;
+            case 3: if (x == 0) { cout << "Ошибка: x=0\n"; return; }; dfx = -p[0]/(x*x); break;
+            case 4: dfx = cos(x); break;
+            case 5: dfx = exp(x); break;
+            case 6: if (x <= 0) { cout << "Ошибка: x<=0 для логарифма\n"; return; }; dfx = 1/x; break;
         }
 
         // защита от деления на ноль (если производная = 0)
@@ -343,23 +197,23 @@ void newton(){
             cout << "Ошибка: производная близка к нулю\n";
             return;
         }
-        
         double xn = x - fx / dfx;
         
         // проверка на достижение точности
         if (fabs(xn - x) < eps){
-            x = xn;  // обновляем корень
-            break;
+            cout << fixed << setprecision(10);
+            cout << "РЕЗУЛЬТАТ\n";
+            cout << "Корень: x = " << xn;
+            cout << "\nКоличество итераций: " << iters;
+            return;
         }
         
         x = xn;  // переходим к следующей итерации
     }
 
-    clear_screen();
+    cout << "Не сошёлся за 50 итераций\n";
 
-    cout << "РЕЗУЛЬТАТ\n";
-    cout << "Корень: x = " << x;
-    cout << "\nКоличество итераций: " << iters;
+    
 }
 
 //МЕНЮ
@@ -367,7 +221,7 @@ void newton(){
 void menu(){
     clear_screen();
     
-    cout << "        SOLVER 1.0.5\n\n";
+    cout << "        SOLVER v1.1\n\n";
 
     cout << "1.Метод бисекции\n";
     cout << "2.Метод хорд\n";
@@ -385,29 +239,16 @@ int main(){
         menu();
         cin >> choice;
 
+        if(choice == 0) break;
         clear_screen();
-
-        if(choice == 0){
-            break;
-        }
-        if(choice == 1){
-            bisection();
-        } else if(choice == 2){
-            chord();
-        } else if(choice == 3){
-            newton();
-        } else {
-            cout << "\n\n\nВыберите один из трёх существующих методов!";
-            cin.ignore();
-            cin.get();
-            continue;
-        }
-
-        cout << "\nPress any button to exit...";
-        cin.ignore();
-        cin.get();
+        if(choice == 1) bisection();
+        else if(choice == 2) chord();
+        else if(choice == 3) newton();
+        else continue;
+        
+        cout << "\n\nEnter для продолжения...";
+        cin.ignore(); cin.get();
     }
-
     return 0;
     
 }
