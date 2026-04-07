@@ -22,6 +22,15 @@ double quadratic_derivative(double x, double a, double b, double c) {
     return 2*a*x+b;
 }
 
+//обратная пропорциональность y=k/x+b и её производная y'=-k/x²
+double hyperbola(double x, double k, double b) {
+    return k/x-b;
+}
+double hyperbola_derivative(double x, double k, double b) {
+    return -k/(x*x);
+}
+
+//синус
 
 //МЕТОДЫ
 
@@ -34,6 +43,8 @@ void bisection(){
     cout << "\n\nВыберите функцию:\n";
     cout << "1.Линейная - kx + b = 0\n";
     cout << "2.Квадратичная - ax² + bx + c = 0\n";
+    cout << "3.Гипербола - k/x = b (x != 0)\n";
+    //cout << "4.Синус - sin(x) = d (d ∈ [-1; 1])\n";
     cin >> func;
 
     clear_screen();
@@ -53,6 +64,11 @@ void bisection(){
             cout << "a = "; cin >> params[0]; //коэф а
             cout << "b = "; cin >> params[1]; //коэф b
             cout << "c = "; cin >> params[2]; //коэф c
+            break;
+        case 3:
+            cout << "Функция: k/x = b\n";
+            cout << "k = "; cin >> params[0]; // коэф k
+            cout << "b = "; cin >> params[1]; // коэф b
             break;
     }
 
@@ -75,6 +91,14 @@ void bisection(){
         case 2:
             fa = quadratic(a, params[0], params[1], params[2]);
             fb = quadratic(b, params[0], params[1], params[2]);
+            break;
+        case 3:
+            if (a == 0 || b == 0) {
+                cout << "Ошибка: гипербола не определена в x=0!\n";
+                return;
+            }
+            fa = hyperbola(a, params[0], params[1]);
+            fb = hyperbola(b, params[0], params[1]);
             break;
     }
 
@@ -104,6 +128,13 @@ void bisection(){
             case 2:
                 fc = quadratic(c, params[0], params[1], params[2]);
                 break;
+            case 3:
+                if (a == 0 || b == 0) {
+                    cout << "Ошибка: гипербола не определена в x=0!\n";
+                    return;
+                }   
+                fc = hyperbola(c, params[0], params[1]);
+                break;
         }
 
         if (fc == 0) break; // точно нашли корень
@@ -132,6 +163,7 @@ void chord(){
     cout << "\n\nВыберите функцию:\n";
     cout << "1.Линейная - kx + b = 0\n";
     cout << "2.Квадратичная - ax² + bx + c = 0\n";
+    cout << "3.Гипербола - k/x = b (x != 0)\n";
     cin >> func;
 
     clear_screen();
@@ -151,6 +183,11 @@ void chord(){
             cout << "a = "; cin >> params[0]; //коэф а
             cout << "b = "; cin >> params[1]; //коэф b
             cout << "c = "; cin >> params[2]; //коэф c
+            break;
+        case 3:
+            cout << "Функция: k/x = b\n";
+            cout << "k = "; cin >> params[0]; // коэф k
+            cout << "b = "; cin >> params[1]; // коэф b
             break;
     }
 
@@ -179,6 +216,14 @@ void chord(){
                 fp = quadratic(xp, params[0], params[1], params[2]);
                 fc = quadratic(xc, params[0], params[1], params[2]);
                 break;
+            case 3:
+                if (xp == 0 || xc == 0) {
+                    cout << "Ошибка: гипербола не определена в x=0!\n";
+                    return;
+                }
+                fp = hyperbola(xp, params[0], params[1]);
+                fc = hyperbola(xc, params[0], params[1]);
+                break;
         }
 
         double xn = xc - fc * (xc - xp) / (fc - fp); // xn - x_next (следующее приближение)
@@ -191,6 +236,13 @@ void chord(){
                 break;
             case 2:
                 fn = quadratic(xn, params[0], params[1], params[2]);
+                break;
+            case 3:
+                if (xn == 0) {
+                    cout << "Ошибка: гипербола не определена в x=0!\n";
+                    return;
+                }
+                fn = hyperbola(xn, params[0], params[1]);
                 break;
         }
 
@@ -219,6 +271,7 @@ void newton(){
     cout << "\n\nВыберите функцию:\n";
     cout << "1. Линейная - kx + b = 0\n";
     cout << "2.Квадратичная - ax² + bx + c = 0\n";
+    cout << "3.Гипербола - k/x = b (x != 0)\n";
     cin >> func;
 
     clear_screen();
@@ -238,6 +291,11 @@ void newton(){
             cout << "a = "; cin >> params[0]; //коэф а
             cout << "b = "; cin >> params[1]; //коэф b
             cout << "c = "; cin >> params[2]; //коэф c
+            break;
+        case 3:
+            cout << "Функция: k/x = b\n";
+            cout << "k = "; cin >> params[0]; // коэф k
+            cout << "b = "; cin >> params[1]; // коэф b
             break;
     }
 
@@ -268,6 +326,15 @@ void newton(){
                 // для квадратичной функции: f(x) = ax² + bx + c
                 fx = quadratic(x, params[0], params[1], params[2]);
                 dfx = quadratic_derivative(x, params[0], params[1], params[2]);
+                break;
+            case 3:
+                if (x == 0) {
+                    cout << "Ошибка: гипербола не определена в x=0!\n";
+                    return;
+                }
+                // для гиперболы: f(x) = k/x - b
+                fx = hyperbola(x, params[0], params[1]);
+                dfx = hyperbola_derivative(x, params[0], params[1]);
                 break;
         }
 
@@ -300,7 +367,7 @@ void newton(){
 void menu(){
     clear_screen();
     
-    cout << "        SOLVER 1.0.4\n\n";
+    cout << "        SOLVER 1.0.5\n\n";
 
     cout << "1.Метод бисекции\n";
     cout << "2.Метод хорд\n";
