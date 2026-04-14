@@ -99,7 +99,7 @@ void bisection(){
 
     // если значения функций на концах отрезка [a;b] равны, то корня на этом отрезке нет
     if (fa*fb>0){
-        cout << "error: same signs on f(a) and f(b): " << fa << " " << fb << "\nНа отрезке нет корня или их чётное количество\n";
+        cout << "error: same signs on f(a) and f(b): " << fa << " " << fb << "\nНа отрезке нет корня или их чётное количество.\n";
         return;
     }
 
@@ -145,6 +145,11 @@ void chord(){
     cout << "Точность (например 0.0001): "; cin >> eps;
     clear_screen();
     xp = x0, xc = x1; // xp - x_previous; xc - x_current
+
+    if (type == 3 && (x0 == 0 || x1 == 0)) {
+        cout << "Ошибка: гипербола не определена в x=0.\n";
+        return;
+    }
 
     while (iters<=50){
         iters++;
@@ -192,19 +197,28 @@ void newton(){
         switch (type){
             case 1: dfx = p[0]; break;
             case 2: dfx = 2*p[0]*x+p[1]; break;
-            case 3: if (x == 0) { cout << "Ошибка: x=0\n"; return; }; dfx = -p[0]/(x*x); break;
+            case 3: if (x == 0) { cout << "Ошибка: x=0.\n"; return; }; dfx = -p[0]/(x*x); break;
             case 4: dfx = cos(x); break;
             case 5: dfx = exp(x); break;
-            case 6: if (x <= 0) { cout << "Ошибка: x<=0 для логарифма\n"; return; }; dfx = 1/x; break;
+            case 6: if (x <= 0) { cout << "Ошибка: x<=0 для логарифма.\n"; return; }; dfx = 1/x; break;
         }
 
         // защита от деления на ноль (если производная = 0)
         if (fabs(dfx) < 1e-12){
-            cout << "Ошибка: производная близка к нулю\n";
+            cout << "Ошибка: производная близка к нулю.\n";
             return;
         }
         double xn = x - fx / dfx;
         
+        if (type == 3 && xn == 0) {
+            cout << "Ошибка: метод ушёл в точку разрыва x=0.\n";
+            return;
+        }
+
+        if (type == 6 && xn <= 0) {
+            cout << "Ошибка: метод ушёл в x<=0, логарифм не определён.\n";
+            return;
+        }
         // проверка на достижение точности
         if (fabs(xn - x) < eps){
             cout << fixed << setprecision(10);
@@ -217,7 +231,7 @@ void newton(){
         x = xn;  // переходим к следующей итерации
     }
 
-    cout << "Не сошёлся за 50 итераций\n";
+    cout << "Не сошёлся за 50 итераций.\n";
 
     
 }
@@ -233,7 +247,7 @@ void menu(){
     cout << "2.Метод хорд\n";
     cout << "3.Метод Ньютона(касательных)\n\n";
 
-    cout << "0.Выход\n\n";
+    cout << "0.Выход.\n\n";
 
     cout << "Выберите метод: ";
 }
